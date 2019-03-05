@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 public class Process {
 	private IOoperation data;
 	Map<String, List<Integer>> tags = new TreeMap<String, List<Integer>>();
-	List<Integer> slides=new ArrayList<Integer>();
+	List<String> slides=new ArrayList<String>();
 	private int piI=0;
 	private String[] temp;
 	Map<Integer, String[]> map = new TreeMap<Integer, String[]>();
@@ -29,7 +29,7 @@ public class Process {
 	    public static boolean DESC = false;
 	public Process() {
 		String line;
-		data=new IOoperation("b_lovely_landscapes");
+		data=new IOoperation("e_shiny_selfies");
 		//System.out.println(numberOfFoto);
 		//System.out.println(numberOfRows+" "+numberOfColumns+" "+numberOfMinCells+" "+numberOfMaxCells);
 		boolean isOk=true;
@@ -44,7 +44,7 @@ public class Process {
 							map.put(piI, temp);
 							for (int i = 0; i < temp.length; i++) {
 								if(i>=2) {
-										addToList(temp[i], piI);
+										addToList(temp[0]+temp[i], piI);
 								}
 							}
 						}
@@ -62,7 +62,7 @@ public class Process {
 		//printTags();
 		makeSlide();
 		System.out.println(slides.size());
-		for (Integer entry2 : slides)
+		for (String entry2 : slides)
         {
 			System.out.println(entry2);
         }
@@ -118,6 +118,7 @@ public class Process {
 	private void makeSlide() {
 		List<Integer> tekrar=new ArrayList<Integer>();
 		int s=0;
+		boolean isV=false;
 		for (Entry<Integer, String[]> entry : map.entrySet())
         {
             //System.out.println("Key : " + entry.getKey() + " Value : "+ entry.getValue()[1]);
@@ -126,7 +127,18 @@ public class Process {
         	for (int i = 0; i < entry.getValue().length; i++) {
 				if(entry.getValue()[0].equals("H")) {
 					if(i>1) {
-						List<Integer> temp =tags.get(entry.getValue()[i]);
+						List<Integer> temp =tags.get("H"+entry.getValue()[i]);
+						for (Integer entry2 : temp)
+				        {
+							if(entry2!=s) {
+								tekrar.add(entry2);
+							}
+				        }
+					}
+				}else {
+					if(i>1) {
+						isV=true;
+						List<Integer> temp =tags.get("V"+entry.getValue()[i]);
 						for (Integer entry2 : temp)
 				        {
 							if(entry2!=s) {
@@ -139,18 +151,42 @@ public class Process {
         	/*if(mostCommon(tekrar)==null) {
         		System.out.println(s);
         	}*/
-        	if(!slides.contains(s)) {
-        		slides.add(s);
+        	if(isV) {
+        		int most=mostCommon(tekrar);
+        		if(vSlidesControl(s, most)) {
+            		slides.add(s+" "+mostCommon(tekrar));
             	
+            	}
+        		isV=false;
+        	}else {
+        		if(!slides.contains(String.valueOf(s))) {
+            		slides.add(String.valueOf(s));
+                	
+            	}
+            	if(!slides.contains(String.valueOf(mostCommon(tekrar)))) {
+            		slides.add(String.valueOf(mostCommon(tekrar)));
+            	}
         	}
-        	if(!slides.contains(mostCommon(tekrar))) {
-        		slides.add(mostCommon(tekrar));
-        	}
+        	
         	
         	tekrar.clear();
         	//System.out.println();
         }
 			
+	}
+	public boolean vSlidesControl(int s, int tekrar) {
+		for(String str: slides) {
+		    if(str.startsWith(String.valueOf(s))) {
+		    	return false;
+		    }else if(str.startsWith(String.valueOf(tekrar))) {
+		    	return false;
+		    }else if(str.endsWith(String.valueOf(s))) {
+		    	return false;
+		    }else if(str.endsWith(String.valueOf(tekrar))) {
+		    	return false;
+		    }
+		}
+		return true;
 	}
 	public static <T> T mostCommon(List<T> list) {
 	    Map<T, Integer> tmap = new HashMap<>();
