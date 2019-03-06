@@ -24,6 +24,7 @@ public class Process {
 	List<String> slides=new ArrayList<String>();
 	private int piI=0;
 	private String[] temp;
+	private String[] empty;
 	Map<Integer, String[]> map = new TreeMap<Integer, String[]>();
 	  public static boolean ASC = true;
 	    public static boolean DESC = false;
@@ -123,54 +124,69 @@ public class Process {
         {
             //System.out.println("Key : " + entry.getKey() + " Value : "+ entry.getValue()[1]);
         	//System.out.println(entry.getKey() );
-        	s=entry.getKey();
-        	for (int i = 0; i < entry.getValue().length; i++) {
-				if(entry.getValue()[0].equals("H")) {
-					if(i>1) {
-						List<Integer> temp =tags.get("H"+entry.getValue()[i]);
-						for (Integer entry2 : temp)
-				        {
-							if(entry2!=s) {
-								tekrar.add(entry2);
-							}
-				        }
-					}
-				}else {
-					if(i>1) {
-						isV=true;
-						List<Integer> temp =tags.get("V"+entry.getValue()[i]);
-						for (Integer entry2 : temp)
-				        {
-							if(entry2!=s) {
-								tekrar.add(entry2);
-							}
-				        }
+			if(entry.getValue()!=null) {
+				s=entry.getKey();
+	        	for (int i = 0; i < entry.getValue().length; i++) {
+					if(entry.getValue()[0].equals("H")) {
+						if(i>1) {
+							List<Integer> temp =tags.get("H"+entry.getValue()[i]);
+							for (Integer entry2 : temp)
+					        {
+								if(entry2!=s&&map.get(entry2)!=null) {
+									tekrar.add(entry2);
+								}
+					        }
+						}
+					}else {
+						if(i>1) {
+							isV=true;
+							List<Integer> temp =tags.get("V"+entry.getValue()[i]);
+							for (Integer entry2 : temp)
+					        {
+								if(entry2!=s&&map.get(entry2)!=null) {
+									tekrar.add(entry2);
+								}
+					        }
+						}
 					}
 				}
+	        	int most;
+	        	if(tekrar.size()>0) {
+	        		most=mostCommon(tekrar);
+	        	}else {
+	        		most=-1;
+	        	}
+	        	
+	        	if(isV) {
+	        		
+	        		//if(vSlidesControl(s, most)) {
+	            		
+	            		if(most>=0) {
+	            			slides.add(s+" "+most);
+	            			map.put(s, empty);
+		            		map.put(most, empty);
+	            		}
+	            		
+	            	//}
+	        		isV=false;
+	        	}else {
+	        		//if(!slides.contains(String.valueOf(s))) {
+	            		slides.add(String.valueOf(s));
+	            		map.put(s, empty);
+	            	//}
+	            	//if(!slides.contains(String.valueOf(most))) {
+	            		if(most>=0) {
+	            			slides.add(String.valueOf(most));
+		            		map.put(most, empty);
+	            		}
+	            		
+	            	//}
+	        	}
+	        	
+	        	
+	        	tekrar.clear();
 			}
-        	/*if(mostCommon(tekrar)==null) {
-        		System.out.println(s);
-        	}*/
-        	if(isV) {
-        		int most=mostCommon(tekrar);
-        		if(vSlidesControl(s, most)) {
-            		slides.add(s+" "+mostCommon(tekrar));
-            	
-            	}
-        		isV=false;
-        	}else {
-        		if(!slides.contains(String.valueOf(s))) {
-            		slides.add(String.valueOf(s));
-                	
-            	}
-            	if(!slides.contains(String.valueOf(mostCommon(tekrar)))) {
-            		slides.add(String.valueOf(mostCommon(tekrar)));
-            	}
-        	}
         	
-        	
-        	tekrar.clear();
-        	//System.out.println();
         }
 			
 	}
