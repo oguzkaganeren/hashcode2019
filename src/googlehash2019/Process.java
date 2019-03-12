@@ -4,16 +4,15 @@
 package googlehash2019;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import java.util.Map.Entry;
+import java.util.Set;
 /**
  * @author oguz
  *
@@ -21,16 +20,16 @@ import java.util.Map.Entry;
 public class Process {
 	private IOoperation data;
 	Map<String, List<Integer>> tags = new TreeMap<String, List<Integer>>();
-	List<String> slides=new ArrayList<String>();
+	Map<String, List<String>> slides = new LinkedHashMap<String, List<String>>();
 	private int piI=0;
 	private String[] temp;
-	private String[] empty;
-	Map<Integer, String[]> map = new TreeMap<Integer, String[]>();
+	private List<String> empty;
+	Map<Integer, List<String>> map = new TreeMap<Integer, List<String>>();
 	  public static boolean ASC = true;
 	    public static boolean DESC = false;
 	public Process() {
 		String line;
-		data=new IOoperation("e_shiny_selfies");
+		data=new IOoperation("c_memorable_moments");
 		//System.out.println(numberOfFoto);
 		//System.out.println(numberOfRows+" "+numberOfColumns+" "+numberOfMinCells+" "+numberOfMaxCells);
 		boolean isOk=true;
@@ -38,21 +37,18 @@ public class Process {
 			line=data.getNextLine();
 			if(line!=null) {
 				temp=line.split(" ");
-					//for (int i = 0; i < temp.length; i++) {
-						//System.out.print(temp[i]+" ");
-						//thedata[piI][i]=temp[i];
 						if(temp.length>1) {
-							map.put(piI, temp);
 							for (int i = 0; i < temp.length; i++) {
+								addToListMap(piI, temp[i]);
+								
 								if(i>=2) {
-										addToList(temp[0]+temp[i], piI);
+									addToListTags(tags,temp[0]+temp[i], piI);
 								}
 							}
+							piI++;
 						}
-						
-					//}
 						if(temp.length>1) {
-					piI++;
+					
 						}
 				
 			}else {
@@ -62,47 +58,75 @@ public class Process {
 		piI=0;
 		//printTags();
 		makeSlide();
-		System.out.println(slides.size());
-		for (String entry2 : slides)
-        {
-			System.out.println(entry2);
-        }
-		
-		
-		//editH();
-		//printSlides();
 		//printMap(map);
+		System.out.println(slides.size());
+		printSlides(slides);
 		
-		//System.out.println(sortedMapAsc.size());
-		//printTags(tags);
-		//printMap(sortedMapAsc);
-		/*for (Map.Entry<Integer, String[]> entry : map.entrySet()) {
-		    System.out.println(entry.getKey() + " => " + entry.getValue()[0]);
-		}*/
 		
 		
 	}
-	public synchronized void addToList(String mapKey, Integer myItem) {
-	    List<Integer> itemsList = tags.get(mapKey);
+	public synchronized void addToListTags(Map<String, List<Integer>> theMap,String mapKey, Integer myItem) {
+	    List<Integer> itemsList = theMap.get(mapKey);
 
 	    // if list does not exist create it
 	    if(itemsList == null) {
 	         itemsList = new ArrayList<Integer>();
 	         itemsList.add(myItem);
-	         tags.put(mapKey, itemsList);
+	         theMap.put(mapKey, itemsList);
 	    } else {
 	        // add if item is not already in list
 	        if(!itemsList.contains(myItem)) itemsList.add(myItem);
 	        
 	    }
 	}
+	public synchronized void addToListMap(int mapKey, String myItem) {
+		List<String> itemsList = map.get(mapKey);
 
-	    public static void printMap(Map<Integer, String[]> map)
+	    // if list does not exist create it
+	    if(itemsList == null) {
+	         itemsList = new ArrayList<String>();
+	         itemsList.add(myItem);
+	         map.put(mapKey, itemsList);
+	    } else {
+	        // add if item is not already in list
+	        if(!itemsList.contains(myItem)) itemsList.add(myItem);
+	        
+	    }
+	}
+	
+
+	    public static void printMap(Map<Integer, List<String>> map)
 	    {
-	        for (Entry<Integer, String[]> entry : map.entrySet())
+	    	
+	        for (Entry<Integer, List<String>> entry : map.entrySet())
 	        {
-	            //System.out.println("Key : " + entry.getKey() + " Value : "+ entry.getValue()[1]);
-	        	System.out.println(entry.getKey() );
+	        	System.out.print(entry.getKey()+" ");
+	        	List<String> temp =entry.getValue();
+				for (String entry2 : temp)
+		        {
+					System.out.print(entry2+" ");
+		        }
+				System.out.println();
+	        }
+	    }
+	    public static void printSlides(Map<String, List<String>> map)
+	    {
+	        for (Entry<String, List<String>> entry : map.entrySet())
+	        {
+	        	/*List<Integer> temp =entry.getKey();
+				for (int i = 0; i < temp.size(); i++) {
+					if(i==1) {
+						System.out.print(" ");
+					}
+					System.out.print(temp.get(i));
+					
+				}*/
+				System.out.print(entry.getKey());
+				/*for (String entry2 : entry.getValue())
+		        {
+					System.out.print(entry2+" ");
+		        }*/
+				System.out.println();
 	        }
 	    }
 	    public static void printTags(Map<String, List<Integer>> map)
@@ -115,21 +139,31 @@ public class Process {
 	        	
 	        }
 	    }
-	int notal=0;
+	    public <T> List<T> union(List<T> list1, List<T> list2) {
+	        Set<T> set = new HashSet<T>();
+
+	        set.addAll(list1);
+	        set.addAll(list2);
+
+	        return new ArrayList<T>(set);
+	    }
 	private void makeSlide() {
 		List<Integer> tekrar=new ArrayList<Integer>();
+		List<String> newtgs=new ArrayList<String>();
 		int s=0;
 		boolean isV=false;
-		for (Entry<Integer, String[]> entry : map.entrySet())
+		for (Entry<Integer, List<String>> entry : map.entrySet())
         {
             //System.out.println("Key : " + entry.getKey() + " Value : "+ entry.getValue()[1]);
-        	//System.out.println(entry.getKey() );
+        	
 			if(entry.getValue()!=null) {
+				
 				s=entry.getKey();
-	        	for (int i = 0; i < entry.getValue().length; i++) {
-					if(entry.getValue()[0].equals("H")) {
+				List<String> entryValue =entry.getValue();
+	        	for (int i = 0; i < entryValue.size(); i++) {
+					if(entryValue.get(0).equals("H")) {
 						if(i>1) {
-							List<Integer> temp =tags.get("H"+entry.getValue()[i]);
+							List<Integer> temp =tags.get("H"+entryValue.get(i));
 							for (Integer entry2 : temp)
 					        {
 								if(entry2!=s&&map.get(entry2)!=null) {
@@ -140,7 +174,7 @@ public class Process {
 					}else {
 						if(i>1) {
 							isV=true;
-							List<Integer> temp =tags.get("V"+entry.getValue()[i]);
+							List<Integer> temp =tags.get("V"+entryValue.get(i));
 							for (Integer entry2 : temp)
 					        {
 								if(entry2!=s&&map.get(entry2)!=null) {
@@ -159,50 +193,35 @@ public class Process {
 	        	
 	        	if(isV) {
 	        		
-	        		//if(vSlidesControl(s, most)) {
-	            		
 	            		if(most>=0) {
-	            			slides.add(s+" "+most);
+	            			slides.put(s+" "+most, union(map.get(s),map.get(most)));
+	            			
 	            			map.put(s, empty);
 		            		map.put(most, empty);
 	            		}
-	            		
-	            	//}
 	        		isV=false;
 	        	}else {
-	        		//if(!slides.contains(String.valueOf(s))) {
-	            		slides.add(String.valueOf(s));
+	            		//slides.add(String.valueOf(s));
+	        			slides.put(String.valueOf(s), map.get(s));
 	            		map.put(s, empty);
-	            	//}
-	            	//if(!slides.contains(String.valueOf(most))) {
 	            		if(most>=0) {
-	            			slides.add(String.valueOf(most));
+	            			slides.put(String.valueOf(most), map.get(most));
+	            			
 		            		map.put(most, empty);
 	            		}
-	            		
-	            	//}
 	        	}
-	        	
 	        	
 	        	tekrar.clear();
 			}
-        	
         }
 			
 	}
-	public boolean vSlidesControl(int s, int tekrar) {
-		for(String str: slides) {
-		    if(str.startsWith(String.valueOf(s))) {
-		    	return false;
-		    }else if(str.startsWith(String.valueOf(tekrar))) {
-		    	return false;
-		    }else if(str.endsWith(String.valueOf(s))) {
-		    	return false;
-		    }else if(str.endsWith(String.valueOf(tekrar))) {
-		    	return false;
-		    }
-		}
-		return true;
+	
+	public void processSlides() {
+		for (Entry<String, List<String>> entry : slides.entrySet())
+        {
+			
+        }
 	}
 	public static <T> T mostCommon(List<T> list) {
 	    Map<T, Integer> tmap = new HashMap<>();
@@ -220,18 +239,5 @@ public class Process {
 	    }
 
 	    return max == null ? null : max.getKey();
-	}
-
-	/**
-	 * @param String Values, not allow input negative
-	 * @return integer value
-	 */
-	public int convertStringToInt(String value) {
-		try {
-			return Integer.parseInt(value);
-		} catch (Exception e) {
-			System.out.println("Error");
-			return -1;
-		}
 	}
 }
